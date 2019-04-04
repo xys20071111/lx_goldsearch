@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { fromJS } from 'immutable';
 import * as types from './ReleaseActionType';
-import { lineOption } from 'Modules/ReleaseExercise/Constants';
+import { lineOption, getXAxisData } from 'Modules/ReleaseExercise/Constants';
 
 
 const homeInitState = fromJS({
@@ -88,9 +88,8 @@ const setCurrentSelectArea = (state, action) => {
 
 const searchDate = (state, action) => {
   console.log('query data:', action)
+  const xAxisData = getXAxisData(action.filter);
   if (!action.isQG) {
-    const xAxisData = [];
-    const seriesData = [];
     return state.setIn(['list'], fromJS(action.filter))
   } else { // 全国数据需要处理
 
