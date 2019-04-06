@@ -20,7 +20,8 @@ class ReleaseExercise extends Component {
       total: 0,
       pageIndex: 1,
       pageSize: 10,
-      filter: {}
+      filter: {},
+      test: 0
     }
   }
 
