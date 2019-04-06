@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { fromJS } from 'immutable';
 import * as types from './ReleaseActionType';
-import { lineOption, getXAxisData } from 'Modules/ReleaseExercise/Constants';
+import { lineOption, getXAxisData, getSeries, getLegend } from 'Modules/ReleaseExercise/Constants';
 
 
 const homeInitState = fromJS({
@@ -13,10 +13,20 @@ const homeInitState = fromJS({
       area_id: 0, // 0: 全国  地域ID
       rec_startdate: '2019-03-06',
       rec_enddate: '2019-03-16'
-    }
+    },
+    keyValue: {}
   },
   lineOption: lineOption
 })
+
+/** 获取省市0:全国*/
+const getKeyValue = (data) => {
+  const datas = data && data.reduce((rs, item) => {
+    rs[item.areaid] = item.name;
+    return rs;
+  }, {})
+  return datas;
+}
 
 const dateConvert = (data, isLeaf = false) => {
   const allAreas = data && data.reduce((rs, item) => {
@@ -30,7 +40,6 @@ const dateConvert = (data, isLeaf = false) => {
     rs.push(item);
     return rs;
   }, []);
-  console.log('所有的省:', allAreas);
   return allAreas;
 }
 
@@ -45,7 +54,8 @@ const getAllAreas = (state, action) => {
     value: 0,
     is_area: false
 }], allAreas);
-  return state.setIn(['filter', 'areas'], fromJS(newArray));
+  return state.setIn(['filter', 'areas'], fromJS(newArray))
+              .mergeIn(['filter', 'keyValue'], fromJS(getKeyValue(action.data)));
 }
 
 /**市 */
@@ -55,7 +65,8 @@ const getSubAreas = (state, action) => {
     const parent = state.getIn(['filter', 'areas']).findIndex(item => {
       return _.isEqual(item.get('areaid'), provinceId);
     });
-    return state.setIn(['filter', 'areas', parent, 'children'], fromJS(dateConvert(action.data)));
+    return state.setIn(['filter', 'areas', parent, 'children'], fromJS(dateConvert(action.data)))
+                .mergeIn(['filter', 'keyValue'], fromJS(getKeyValue(action.data)));
   }
   return state;
 }
@@ -73,7 +84,8 @@ const getChildrenSubAreas = (state, action) => {
       return _.isEqual(item.get('city'), city);
     });
 
-    return state.setIn(['filter', 'areas', parentIndex, 'children', cityIndex, 'children'], fromJS(dateConvert(action.data, true)));
+    return state.setIn(['filter', 'areas', parentIndex, 'children', cityIndex, 'children'], fromJS(dateConvert(action.data, true)))
+                .mergeIn(['filter', 'keyValue'], fromJS(getKeyValue(action.data)));
   }
   return state;
 }
@@ -87,10 +99,14 @@ const setCurrentSelectArea = (state, action) => {
 }
 
 const searchDate = (state, action) => {
-  console.log('query data:', action)
   const xAxisData = getXAxisData(action.filter);
   if (!action.isQG) {
+    const seriesData = getSeries(action.filter, state.getIn(['filter', 'keyValue']));
+    const legend = getLegend(action.filter, state.getIn(['filter', 'keyValue']));
     return state.setIn(['list'], fromJS(action.filter))
+                .updateIn(['lineOption', 'xAxis', 'data'], () => xAxisData)
+                .updateIn(['lineOption', 'series'], () => _.values(seriesData))
+                .updateIn(['lineOption', 'legend', 'data'], () => legend);
   } else { // 全国数据需要处理
 
   }
@@ -115,7 +131,5 @@ const releaseReducer = (state = homeInitState, action) => {
 const reducers = {
   home: releaseReducer
 }
-
-export const getReleaseReducer = state => state.home.toJS()
 
 export default reducers;

@@ -13,20 +13,29 @@ export const COLUMNS = [{
 
 
 export const lineOption = {
-  title: {
-    text: '折线图堆叠'
-  },
   tooltip: {
+    show: true,
+    confine:true,
     trigger: 'axis'
   },
   legend: {
-    data:['邮件营销']
+    left: 'center',
+    data:[]
   },
+  noDataLoadingOption: {
+    text: '暂无数据',
+    effect: 'bubble',
+    effectOption: {
+      effect: {
+        n: 0
+      }
+    }
+ },
   grid: {
-    left: '3%',
-    right: '4%',
+    left: '1%',
+    right: '1%',
     bottom: '3%',
-    containLabel: false
+    containLabel: true
   },
   toolbox: {
     feature: {
@@ -36,19 +45,12 @@ export const lineOption = {
   xAxis: {
     type: 'category',
     boundaryGap: false,
-    data: ['2018-03-01','2018-03-02','周三','周四','周五','周六','周日']
+    data: []
   },
   yAxis: {
     type: 'value'
   },
-  series: [
-    {
-      name:'发布练习次数',
-      type:'line',
-      stack: '总量',
-      data:[120, 132, 101, 134, 90, 230, 210]
-    }
-  ]
+  series: []
 };
 
 
@@ -89,6 +91,40 @@ export const getXAxisData = (data = []) => {
       retArray.push(data[x].rec_date);
     }
   }
-  console.log('get search data:', retArray);
+  console.log('get xAxis data:', retArray);
   return retArray;
 }
+
+
+
+export const getSeries = (data = [], keyvalue = {}) => {
+  /* 先将所有的数据转换为某个区县下的对象，*/
+  const length = data.length;
+  const seriesData = {};
+  for (let x = 0; x < length; x++) {
+    if (seriesData[data[x].area_id]) {
+      seriesData[data[x].area_id].data.push(data[x].publish_count);
+    } else {
+      seriesData[data[x].area_id] = {
+        name: keyvalue.get(data[x].area_id.toString()),
+        area_id: data[x].area_id,
+        type: 'line',
+        stack: '总量',
+        data: [data[x].publish_count]
+      }
+    }
+  }
+
+  // 对象转数组
+  console.log('get Series data:', seriesData);
+  return seriesData;
+}
+
+
+export const getLegend = (data = [], keyvalue = {}) => {
+  const seriesObjectData = getSeries(data, keyvalue);
+  const legend = Object.keys(seriesObjectData).map(item => keyvalue.get(item.toString()));
+  console.log('get legend:', legend);
+  return legend;
+}
+

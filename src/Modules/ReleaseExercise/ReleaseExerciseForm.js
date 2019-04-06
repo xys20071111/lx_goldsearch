@@ -5,7 +5,7 @@ import Fetch from 'Common/Helpers';
 import 'moment/locale/zh-cn';
 import { connect } from 'react-redux';
 import * as types from './Store/ReleaseActionType';
-import { getReleaseReducer } from './Store/ReleaseReducer';
+import { getAreasSelector } from './Store/ReleaseSelector';
 import { Form, Row, Col, Button, DatePicker, Cascader } from 'antd';
 moment.locale('zh-cn');
 const { RangePicker } = DatePicker;
@@ -118,9 +118,8 @@ class ReleaseExerciseFilter extends React.Component {
 const ReleaseExerciseForm = Form.create({ name: 'release_exercise' })(ReleaseExerciseFilter);
 
 const mapStateToProps = (state) => {
-  state = getReleaseReducer(state);
   return {
-    option: state.filter.areas
+    option: getAreasSelector(state)
   }
 };
 const mapDispatchToProps = (dispatch, ownProps) => {

@@ -8,7 +8,12 @@ import { message } from 'antd';
 import * as types from './Store/ReleaseActionType';
 import ReleaseExerciseForm from './ReleaseExerciseForm';
 import ReleaseExerciseContent from './ReleaseExerciseContent';
-import { getReleaseReducer } from './Store/ReleaseReducer';
+import {
+  getLineOptionSelector,
+  getKeyValuesSelector,
+  getListSelector,
+  getCurrentSelectSelector
+} from './Store/ReleaseSelector';
 moment.locale('zh-cn');
 
 
@@ -29,7 +34,7 @@ class ReleaseExercise extends Component {
     const { currentSelect } = this.props;
     Fetch('app/homework/getsubareatimepublishstat', { query: currentSelect }).then(rs => {
       if (_.isEqual(rs.result, 0) && rs.data.stat_data && _.size(rs.data.stat_data) > 0) {
-        console.log('ui  search data:', rs)
+        // console.log('ui  search data:', rs)
         this.props.searchData(rs.data.stat_data, currentSelect.area_type === 0 ? true : false);
       } else {
         message.error(rs.msg);
@@ -45,6 +50,7 @@ class ReleaseExercise extends Component {
         />
         <ReleaseExerciseContent
           data={this.props.list}
+          lineOption={this.props.lineOption}
         />
       </div>
     )
@@ -54,10 +60,11 @@ class ReleaseExercise extends Component {
 
 
 const mapStateToProps = (state) => {
-  state = getReleaseReducer(state);
   return {
-    currentSelect: state.filter.currentSelect,
-    list: state.list
+    currentSelect: getCurrentSelectSelector(state),
+    list: getListSelector(state),
+    lineOption: getLineOptionSelector(state), 
+    keyValue: getKeyValuesSelector(state)
   }
 };
 const mapDispatchToProps = (dispatch, ownProps) => {
