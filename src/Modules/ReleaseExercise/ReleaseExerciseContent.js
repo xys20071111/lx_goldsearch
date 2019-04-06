@@ -26,7 +26,7 @@ class ReleaseExerciseContent extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.lineOption.series !== nextProps.lineOption.series) {
+    if (this.props.lineOption !== nextProps.lineOption) {
       console.log('图标数据变更:', nextProps.lineOption);
       this.myChart.clear();
       this.myChart.setOption(nextProps.lineOption, true);

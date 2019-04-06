@@ -31,8 +31,6 @@ class ReleaseExerciseFilter extends React.Component {
     const targetOption = selectedOptions[selectedOptions.length - 1];
     if (_.isEqual(targetOption.type, 1)) {
       this.getAllAreasData(targetOption.areaid, data => this.props.getSubareas(data));
-    } else if (_.isEqual(targetOption.type, 2)) {
-      this.getAllAreasData(targetOption.areaid, data => this.props.getChildrenSubareas(data));
     }
   }
 
@@ -40,6 +38,9 @@ class ReleaseExerciseFilter extends React.Component {
   onChange = (value, selectedOptions) => {
     const targetOption = selectedOptions[selectedOptions.length - 1];
     const { areaid, type } = targetOption;
+    if (_.isEqual(targetOption.type, 2)) {
+      this.getAllAreasData(targetOption.areaid, data => this.props.getChildrenSubareas(data));
+    }
     this.props.setSelectedArea(areaid, type);
   }
 

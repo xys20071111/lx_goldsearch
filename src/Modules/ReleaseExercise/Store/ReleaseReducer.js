@@ -65,7 +65,7 @@ const getSubAreas = (state, action) => {
     const parent = state.getIn(['filter', 'areas']).findIndex(item => {
       return _.isEqual(item.get('areaid'), provinceId);
     });
-    return state.setIn(['filter', 'areas', parent, 'children'], fromJS(dateConvert(action.data)))
+    return state.setIn(['filter', 'areas', parent, 'children'], fromJS(dateConvert(action.data, true)))
                 .mergeIn(['filter', 'keyValue'], fromJS(getKeyValue(action.data)));
   }
   return state;
@@ -84,8 +84,9 @@ const getChildrenSubAreas = (state, action) => {
       return _.isEqual(item.get('city'), city);
     });
 
-    return state.setIn(['filter', 'areas', parentIndex, 'children', cityIndex, 'children'], fromJS(dateConvert(action.data, true)))
-                .mergeIn(['filter', 'keyValue'], fromJS(getKeyValue(action.data)));
+    /*return state.setIn(['filter', 'areas', parentIndex, 'children', cityIndex, 'children'], fromJS(dateConvert(action.data, true)))
+                .mergeIn(['filter', 'keyValue'], fromJS(getKeyValue(action.data)));*/
+    return state.mergeIn(['filter', 'keyValue'], fromJS(getKeyValue(action.data)));
   }
   return state;
 }
@@ -100,16 +101,16 @@ const setCurrentSelectArea = (state, action) => {
 
 const searchDate = (state, action) => {
   const xAxisData = getXAxisData(action.filter);
-  if (!action.isQG) {
+  //if (!action.isQG) {
     const seriesData = getSeries(action.filter, state.getIn(['filter', 'keyValue']));
     const legend = getLegend(action.filter, state.getIn(['filter', 'keyValue']));
     return state.setIn(['list'], fromJS(action.filter))
                 .updateIn(['lineOption', 'xAxis', 'data'], () => xAxisData)
                 .updateIn(['lineOption', 'series'], () => _.values(seriesData))
                 .updateIn(['lineOption', 'legend', 'data'], () => legend);
-  } else { // 全国数据需要处理
+  //} else { // 全国数据需要处理
 
-  }
+  //}
   return state;
 }
 

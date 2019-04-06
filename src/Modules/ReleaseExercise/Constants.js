@@ -125,6 +125,8 @@ export const getLegend = (data = [], keyvalue = {}) => {
   const seriesObjectData = getSeries(data, keyvalue);
   const legend = Object.keys(seriesObjectData).map(item => keyvalue.get(item.toString()));
   console.log('get legend:', legend);
-  return legend;
+  return legend && legend.map(leg => {
+    return { name: leg, icon:'rect' }
+  });
 }
 
