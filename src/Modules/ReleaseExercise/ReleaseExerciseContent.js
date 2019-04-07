@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import { COLUMNS } from './Constants';
+import { GET_COLUMNS } from './Constants';
 import { Table, Layout } from 'antd';
 import echarts from 'echarts/lib/echarts';
 import 'echarts/lib/component/tooltip';
@@ -33,17 +33,32 @@ class ReleaseExerciseContent extends React.Component {
     }
   }
 
+  itemRender = (current, type, originalElement) => {
+    if (type === 'prev') {
+      return <span>上一页</span>;
+    } if (type === 'next') {
+      return <span>下一页</span>;
+    }
+    return originalElement;
+  }
+
 
   renderTable = () => {
+    const { keyValue } = this.props;
     return (
       <Table
         bordered
         rowKey={record => `${record.area_id}_${record.rec_date}_${record.publish_count}`}
         style={BODY_MARGIN_STYLE}
         loading={false}
-        columns={COLUMNS}
+        columns={GET_COLUMNS(keyValue)}
         dataSource={this.props.data}
         size="small"
+        pagination={{
+          showSizeChanger: true,
+          itemRender: this.itemRender,
+          pageSizeOptions: ['5','10','20','30','40'],
+        }}
       />
     )
   }

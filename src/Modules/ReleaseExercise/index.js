@@ -50,6 +50,7 @@ class ReleaseExercise extends Component {
         />
         <ReleaseExerciseContent
           data={this.props.list}
+          keyValue={this.props.keyValue}
           lineOption={this.props.lineOption}
         />
       </div>

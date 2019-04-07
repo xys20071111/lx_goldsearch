@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { fromJS } from 'immutable';
 import * as types from './ReleaseActionType';
-import { lineOption, getXAxisData, getSeries, getLegend } from 'Modules/ReleaseExercise/Constants';
+import { lineOption, getXAxisData, getSeries, getLegend, getBeforeDay } from 'Modules/ReleaseExercise/Constants';
 
 
 const homeInitState = fromJS({
@@ -11,8 +11,8 @@ const homeInitState = fromJS({
     currentSelect: {
       area_type: 0, // 0:全国  1:省  2:市 3:区
       area_id: 0, // 0: 全国  地域ID
-      rec_startdate: '2019-03-06',
-      rec_enddate: '2019-03-16'
+      rec_startdate: getBeforeDay(-6),
+      rec_enddate: getBeforeDay(0)
     },
     keyValue: {}
   },
@@ -114,6 +114,15 @@ const searchDate = (state, action) => {
   return state;
 }
 
+const setRangePicker = (state, action) => {
+  const { startTime = undefined, endTime = undefined } = action;
+  if (startTime && endTime) {
+    return state.setIn(['filter', 'currentSelect', 'rec_startdate'], startTime)
+                .setIn(['filter', 'currentSelect', 'rec_enddate'], endTime);
+  }
+  return state;
+}
+
 
 const releaseReducer = (state = homeInitState, action) => {
   switch (action.type) {
@@ -123,6 +132,7 @@ const releaseReducer = (state = homeInitState, action) => {
 
     case types.SET_SELECTED_AREA: return setCurrentSelectArea(state, action);
     case types.SEARCH_DATA: return searchDate(state, action);
+    case types.SET_SELECTED_RANGE_PICKER: return setRangePicker(state, action);
     default:
       return state;
   }

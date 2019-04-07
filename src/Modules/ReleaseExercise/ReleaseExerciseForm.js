@@ -5,8 +5,14 @@ import Fetch from 'Common/Helpers';
 import 'moment/locale/zh-cn';
 import { connect } from 'react-redux';
 import * as types from './Store/ReleaseActionType';
-import { getAreasSelector } from './Store/ReleaseSelector';
+import { getAreasSelector, getCurrentSelectSelector } from './Store/ReleaseSelector';
 import { Form, Row, Col, Button, DatePicker, Cascader } from 'antd';
+import {
+  getMonthStartDate,
+  getBeforeDay,
+  getLastMonthStartDate,
+  getLastMonthEndDate
+} from './Constants';
 moment.locale('zh-cn');
 const { RangePicker } = DatePicker;
 
@@ -44,37 +50,16 @@ class ReleaseExerciseFilter extends React.Component {
     this.props.setSelectedArea(areaid, type);
   }
 
-  getFields = () => {
-    const { getFieldDecorator } = this.props.form;
-    return (
-      <Row gutter={20}>
-        <Col span={1}>
-          <Button type="primary">本月</Button>
-        </Col>
-        <Col span={1}>
-          <Button type="primary">上月</Button>
-        </Col>
-        <Col span={6}>
-          <Form.Item >
-            {getFieldDecorator('release-range-picker')(
-              <RangePicker />
-            )}
-          </Form.Item>
-        </Col>
-        <Col span={6}>
-          <Cascader
-            onChange={this.onChange}
-            size="large"
-            options={this.props.option}
-            loadData={() => this.loadData}
-            onPopupVisibleChange={this.visible}
-          />
-        </Col>
-        <Col span={1}>
-          <Button type="primary" icon="search">查询</Button>
-        </Col>
-      </Row>
-    )
+  onHandleRangePicker = (data, dateString) => {
+    this.props.setRangePicker(dateString[0], dateString[1]);
+  }
+
+  getMonthDate = (type = 'current') => {
+    if (type === 'current') {
+      this.props.setRangePicker(getMonthStartDate(), getBeforeDay(0));
+    } else if (type === 'last') {
+      this.props.setRangePicker(getLastMonthStartDate(), getLastMonthEndDate());
+    }
   }
 
   render() {
@@ -84,17 +69,20 @@ class ReleaseExerciseFilter extends React.Component {
       <Form className="release_exercise-form" onSubmit={this.handleSearch} >
         <Row gutter={20}>
         <Col span={1}>
-          <Button type="primary">本月</Button>
+          <Button type="primary" onClick={() => this.getMonthDate('current')}>本月</Button>
         </Col>
         <Col span={1}>
-          <Button type="primary">上月</Button>
+          <Button type="primary" onClick={() => this.getMonthDate('last')}>上月</Button>
         </Col>
         <Col span={6}>
           <Form.Item >
             {getFieldDecorator('release-range-picker', {
-              initialValue: [moment('2019/03/01', 'YYYY-MM-DD'), moment('2019/03/15', 'YYYY-MM-DD')]
+              initialValue: [
+                moment(this.props.currentData.rec_startdate, 'YYYY-MM-DD'),
+                moment(this.props.currentData.rec_enddate, 'YYYY-MM-DD')
+              ],
             })(
-              <RangePicker />
+              <RangePicker onChange={this.onHandleRangePicker} />
             )}
           </Form.Item>
         </Col>
@@ -120,7 +108,8 @@ const ReleaseExerciseForm = Form.create({ name: 'release_exercise' })(ReleaseExe
 
 const mapStateToProps = (state) => {
   return {
-    option: getAreasSelector(state)
+    option: getAreasSelector(state),
+    currentData: getCurrentSelectSelector(state)
   }
 };
 const mapDispatchToProps = (dispatch, ownProps) => {
@@ -128,7 +117,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     getAllAreas: data => dispatch({ type: types.GET_ALL_AREAS, data }),
     getSubareas: data => dispatch({ type: types.GET_SUB_AREAS, data }),
     getChildrenSubareas: data => dispatch({ type: types.GET_CHILDREN_SUB_AREAS, data }),
-    setSelectedArea: (areaid, areaType) => dispatch({ type: types.SET_SELECTED_AREA, areaid, areaType })
+    setSelectedArea: (areaid, areaType) => dispatch({ type: types.SET_SELECTED_AREA, areaid, areaType }),
+    setRangePicker: (startTime, endTime) => dispatch({ type: types.SET_SELECTED_RANGE_PICKER, startTime, endTime })
   };
 }
 export default connect(mapStateToProps, mapDispatchToProps)(ReleaseExerciseForm);
