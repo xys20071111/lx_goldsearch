@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { fromJS } from 'immutable';
 import * as types from './ReleaseActionType';
-import { lineOption, getXAxisData, getSeries, getLegend, getBeforeDay } from 'Modules/ReleaseExercise/Constants';
+import { lineOption, getXAxisData, getSeries, getLegend, getBeforeDay, getAllQG } from 'Modules/ReleaseExercise/Constants';
 
 
 const homeInitState = fromJS({
@@ -101,17 +101,30 @@ const setCurrentSelectArea = (state, action) => {
 
 const searchDate = (state, action) => {
   const xAxisData = getXAxisData(action.filter);
-  //if (!action.isQG) {
-    const seriesData = getSeries(action.filter, state.getIn(['filter', 'keyValue']));
-    const legend = getLegend(action.filter, state.getIn(['filter', 'keyValue']));
-    return state.setIn(['list'], fromJS(action.filter))
-                .updateIn(['lineOption', 'xAxis', 'data'], () => xAxisData)
-                .updateIn(['lineOption', 'series'], () => _.values(seriesData))
-                .updateIn(['lineOption', 'legend', 'data'], () => legend);
-  //} else { // 全国数据需要处理
+  const seriesData = getSeries(action.filter, state.getIn(['filter', 'keyValue']));
+  const legend = getLegend(action.filter, state.getIn(['filter', 'keyValue']));
 
-  //}
-  return state;
+  // 增加全国数据
+  if (action.isQG) {
+    const qgData = getAllQG(action.filter);
+    seriesData[0] = {
+      area_id: 0,
+      data: _.map(qgData, x => _.values(x)[0]),
+      name: '全国',
+      type: 'line'
+    };
+    legend.unshift({
+      name: '全国',
+      icon: 'rect'
+    });
+  }
+
+
+  return state.setIn(['list'], fromJS(action.filter))
+              .updateIn(['lineOption', 'xAxis', 'data'], () => xAxisData)
+              .updateIn(['lineOption', 'series'], () => _.values(seriesData))
+              .updateIn(['lineOption', 'legend', 'data'], () => legend);
+
 }
 
 const setRangePicker = (state, action) => {

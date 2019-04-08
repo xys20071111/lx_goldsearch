@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { GET_COLUMNS } from './Constants';
-import { Table, Layout } from 'antd';
+import { Table, Layout, Spin } from 'antd';
 import echarts from 'echarts/lib/echarts';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/legend';
@@ -22,7 +22,11 @@ class ReleaseExerciseContent extends React.Component {
   componentDidMount() {
     this.myChart = echarts.init(document.getElementById('main'));
     console.log('图标初始化数据:', this.props.lineOption)
-    this.myChart.setOption(this.props.lineOption);
+    if (this.props.lineOption.series.length === 0) {
+      this.myChart.clear();
+    } else {
+      this.myChart.setOption(this.props.lineOption);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -64,17 +68,23 @@ class ReleaseExerciseContent extends React.Component {
   }
 
   renderLineChart = () => {
+    const { series = [] } = this.props.lineOption;
     return (
-      <div style={{ height: '45%' }} id='main' />
+      <div className='echart_main'>
+        {series.length === 0 ? <div className='noData'>无数据</div> : null}
+        <div id='main' className='echart' />
+      </div>
     )
   }
 
   render() {
     return (
-      <Content>
-        {this.renderLineChart()}
-        {this.renderTable()}
-      </Content>
+      <Spin spinning={false}>
+        <Content>
+          {this.renderLineChart()}
+          {this.renderTable()}
+        </Content>
+      </Spin>
     );
   }
 }

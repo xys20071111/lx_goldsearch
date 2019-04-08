@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 
 const COLUMNS = [
 {
@@ -6,15 +8,28 @@ const COLUMNS = [
   align: 'center',
   dataIndex: 'area_id'
 }, {
-  title: '发布日期',
-  width: '70%',
-  align: 'left',
-  dataIndex: 'rec_date'
-}, {
-  title: '发布次数',
+  title: '发布次数(可排序)',
   width: '20%',
   align: 'center',
-  dataIndex: 'publish_count'
+  dataIndex: 'publish_count',
+  sorter: (a, b) => a.publish_count - b.publish_count
+}, {
+  title: '',
+  width: '50%',
+  align: 'center',
+}, {
+  title: '发布日期',
+  width: '20%',
+  align: 'center',
+  dataIndex: 'rec_date',
+  sorter: (a, b) => a.rec_date - b.rec_date,
+  render: (text) => {
+    const lmpText = text.toString();
+    const year = lmpText.substring(0,4);
+    const month = lmpText.substring(5,6) < 10 ? `0${lmpText.substring(5,6)}` : lmpText.substring(5,6);
+    const day = lmpText.substring(7,8) < 10 ? `0${lmpText.substring(7,8)}` : lmpText.substring(7,8);
+    return `${year}-${month}-${day}`;
+  }
 }];
 
 export const GET_COLUMNS = (keyvalue) => {
@@ -39,33 +54,19 @@ export const lineOption = {
     left: 'center',
     data:[]
   },
-  noDataLoadingOption: {
-    text: '暂无数据',
-    effect: 'bubble',
-    effectOption: {
-      effect: {
-        n: 0
-      }
-    }
-  },
-  axisLabel: {  
-   interval:0,  
-   rotate:40  
-  },
   grid: {
     left: '1%',
     right: '1%',
     bottom: '3%',
     containLabel: true
   },
-  toolbox: {
-    feature: {
-      saveAsImage: {}
-    }
-  },
   xAxis: {
     type: 'category',
     boundaryGap: false,
+    axisLabel: {
+      rotate: 35,
+      interval: 0
+    },
     data: []
   },
   yAxis: {
@@ -95,9 +96,9 @@ const doHandleMonth = (month) => {
   }
   return m;
 }
-const now = new Date(); //当前日期 
-var nowMonth = now.getMonth(); //当前月 
-let nowYear = now.getYear(); //当前年 
+const now = new Date(); //当前日期
+var nowMonth = now.getMonth(); //当前月
+let nowYear = now.getYear(); //当前年
 nowYear += (nowYear < 2000) ? 1900 : 0;
 
 const lastMonthDate = new Date(); //上月日期
@@ -106,48 +107,43 @@ lastMonthDate.setMonth(lastMonthDate.getMonth()-1);
 const lastMonth = lastMonthDate.getMonth();
 
 
-const formatDate = (date) => { 
-  const myyear = date.getFullYear(); 
-  let mymonth = date.getMonth() + 1; 
-  let myweekday = date.getDate(); 
+const formatDate = (date) => {
+  const myyear = date.getFullYear();
+  let mymonth = date.getMonth() + 1;
+  let myweekday = date.getDate();
 
-  if(mymonth < 10) { 
-    mymonth = `0${mymonth}`; 
-  } 
-  if(myweekday < 10) { 
-    myweekday = `0${myweekday}`; 
-  } 
-  return `${myyear}-${mymonth}-${myweekday}`; 
+  if(mymonth < 10) {
+    mymonth = `0${mymonth}`;
+  }
+  if(myweekday < 10) {
+    myweekday = `0${myweekday}`;
+  }
+  return `${myyear}-${mymonth}-${myweekday}`;
 }
-//获得某月的天数 
-const getMonthDays = (myMonth) => { 
-  const monthStartDate = new Date(nowYear, myMonth, 1); 
-  const monthEndDate = new Date(nowYear, myMonth + 1, 1); 
-  const days = (monthEndDate - monthStartDate) / (1000 * 60 * 60 * 24); 
+//获得某月的天数
+const getMonthDays = (myMonth) => {
+  const monthStartDate = new Date(nowYear, myMonth, 1);
+  const monthEndDate = new Date(nowYear, myMonth + 1, 1);
+  const days = (monthEndDate - monthStartDate) / (1000 * 60 * 60 * 24);
   return days;
-} 
+}
 //获得上月开始时间
 export const getLastMonthStartDate = () => {
   const lastMonthStartDate = new Date(nowYear, lastMonth, 1);
-  return formatDate(lastMonthStartDate); 
+  return formatDate(lastMonthStartDate);
 }
 //获得上月结束时间
 export const getLastMonthEndDate = () => {
   const lastMonthEndDate = new Date(nowYear, lastMonth, getMonthDays(lastMonth));
-  return formatDate(lastMonthEndDate); 
+  return formatDate(lastMonthEndDate);
 }
-//获得本月的开始日期 
-export const getMonthStartDate = () => { 
-  const monthStartDate = new Date(nowYear, nowMonth, 1); 
-  return formatDate(monthStartDate); 
+//获得本月的开始日期
+export const getMonthStartDate = () => {
+  const monthStartDate = new Date(nowYear, nowMonth, 1);
+  return formatDate(monthStartDate);
 }
 
-
-
-
-
-
-
+/**获取X轴数据 */
 export const getXAxisData = (data = []) => {
   const length = data.length;
   const retArray = [];
@@ -160,8 +156,7 @@ export const getXAxisData = (data = []) => {
   return retArray;
 }
 
-
-
+/**获取图标数据 */
 export const getSeries = (data = [], keyvalue = {}) => {
   /* 先将所有的数据转换为某个区县下的对象，*/
   const length = data.length;
@@ -174,7 +169,6 @@ export const getSeries = (data = [], keyvalue = {}) => {
         name: keyvalue.get(data[x].area_id.toString()),
         area_id: data[x].area_id,
         type: 'line',
-        stack: '总量',
         data: [data[x].publish_count]
       }
     }
@@ -185,7 +179,7 @@ export const getSeries = (data = [], keyvalue = {}) => {
   return seriesData;
 }
 
-
+/**获取图例 */
 export const getLegend = (data = [], keyvalue = {}) => {
   const seriesObjectData = getSeries(data, keyvalue);
   const legend = Object.keys(seriesObjectData).map(item => keyvalue.get(item.toString()));
@@ -195,3 +189,13 @@ export const getLegend = (data = [], keyvalue = {}) => {
   });
 }
 
+/**统计全国的数据 */
+export const getAllQG = (data = []) => {
+  const qgData = _.groupBy(data, 'rec_date');
+  const retData = Object.keys(qgData).map(key => {
+    return {
+      [key]: _.sumBy(qgData[key], item => item.publish_count)
+    }
+  })
+  return retData;
+}
