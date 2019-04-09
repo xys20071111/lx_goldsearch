@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "proxy": "http://cs.lejiaolexue.cn",
+  "homepage": "/items/goldsearch/",
   "dependencies": {
     "@babel/core": "7.2.2",
     "@svgr/webpack": "4.1.0",
@@ -54,6 +55,7 @@
     "react-dom": "^16.8.4",
     "react-hot-loader": "^4.8.2",
     "react-redux": "^6.0.1",
+    "react-router-dom": "^5.0.0",
     "react-router-redux": "^4.0.8",
     "redux": "^4.0.1",
     "redux-devtools-extension": "^2.13.8",

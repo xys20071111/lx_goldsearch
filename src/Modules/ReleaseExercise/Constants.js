@@ -4,22 +4,18 @@ import _ from 'lodash';
 const COLUMNS = [
 {
   title: '发布地区',
-  width: '10%',
+  width: '30%',
   align: 'center',
   dataIndex: 'area_id'
 }, {
   title: '发布次数(可排序)',
-  width: '20%',
+  width: '30%',
   align: 'center',
   dataIndex: 'publish_count',
   sorter: (a, b) => a.publish_count - b.publish_count
 }, {
-  title: '',
-  width: '50%',
-  align: 'center',
-}, {
   title: '发布日期',
-  width: '20%',
+  width: '30%',
   align: 'center',
   dataIndex: 'rec_date',
   sorter: (a, b) => a.rec_date - b.rec_date,
@@ -52,7 +48,8 @@ export const lineOption = {
   },
   legend: {
     left: 'center',
-    data:[]
+    data:[],
+    selected: {}
   },
   grid: {
     left: '1%',

@@ -103,7 +103,7 @@ const searchDate = (state, action) => {
   const xAxisData = getXAxisData(action.filter);
   const seriesData = getSeries(action.filter, state.getIn(['filter', 'keyValue']));
   const legend = getLegend(action.filter, state.getIn(['filter', 'keyValue']));
-
+  let selectLegend = undefined;
   // 增加全国数据
   if (action.isQG) {
     const qgData = getAllQG(action.filter);
@@ -115,15 +115,28 @@ const searchDate = (state, action) => {
     };
     legend.unshift({
       name: '全国',
-      icon: 'rect'
+      icon: 'rect',
+      selected: false
     });
   }
 
+  /**如果图例里面有全国，就设置其他图例为false */
+  if (_.find(legend, x => _.isEqual(x.name,'全国'))) {
+    selectLegend = selectLegend = legend && legend.reduce((res, item) => {
+      if (_.isEqual(item.name, '全国')) {
+        res[item.name] = true;
+      } else {
+        res[item.name] = false;
+      }
+      return res;
+    }, {})
+  }
 
   return state.setIn(['list'], fromJS(action.filter))
               .updateIn(['lineOption', 'xAxis', 'data'], () => xAxisData)
               .updateIn(['lineOption', 'series'], () => _.values(seriesData))
-              .updateIn(['lineOption', 'legend', 'data'], () => legend);
+              .updateIn(['lineOption', 'legend', 'data'], () => legend)
+              .updateIn(['lineOption', 'legend', 'selected'], () => selectLegend);
 
 }
 

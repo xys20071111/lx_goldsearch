@@ -64,7 +64,7 @@ const mapStateToProps = (state) => {
   return {
     currentSelect: getCurrentSelectSelector(state),
     list: getListSelector(state),
-    lineOption: getLineOptionSelector(state), 
+    lineOption: getLineOptionSelector(state),
     keyValue: getKeyValuesSelector(state)
   }
 };

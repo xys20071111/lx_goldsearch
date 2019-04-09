@@ -25,7 +25,7 @@ class ReleaseExerciseFilter extends React.Component {
 
   /**获取全国所有地区 */
   getAllAreasData = (areaid = 0, callback, isarea = 0) => {
-    Fetch('api/meta/getsubareas', { query: { areaid, isarea } }).then(rs => {
+    Fetch(`/api/meta/getsubareas`, { query: { areaid, isarea } }).then(rs => {
       if (_.isEqual(rs.result, 0) && rs.data && _.size(rs.data) > 0) {
         callback(rs.data);
       }
@@ -67,14 +67,14 @@ class ReleaseExerciseFilter extends React.Component {
 
     return (
       <Form className="release_exercise-form" onSubmit={this.handleSearch} >
-        <Row gutter={20}>
-        <Col span={1}>
+        <Row>
+        <Col className="release_exercise-form-col">
           <Button type="primary" onClick={() => this.getMonthDate('current')}>本月</Button>
         </Col>
-        <Col span={1}>
+        <Col className="release_exercise-form-col">
           <Button type="primary" onClick={() => this.getMonthDate('last')}>上月</Button>
         </Col>
-        <Col span={6}>
+        <Col className="release_exercise-form-col">
           <Form.Item >
             {getFieldDecorator('release-range-picker', {
               initialValue: [
@@ -86,7 +86,7 @@ class ReleaseExerciseFilter extends React.Component {
             )}
           </Form.Item>
         </Col>
-        <Col span={6}>
+        <Col className="release_exercise-form-col cascader">
           <Cascader
             size="large"
             defaultValue={[0]}
@@ -96,7 +96,7 @@ class ReleaseExerciseFilter extends React.Component {
             changeOnSelect
           />
         </Col>
-        <Col span={1}>
+        <Col className="release_exercise-form-col">
           <Button type="primary" icon="search" onClick={() => this.props.onHandleSearch()}>查询</Button>
         </Col>
       </Row>

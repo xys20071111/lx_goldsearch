@@ -1,5 +1,8 @@
 //前置拼接url
-let api = 'http://cs.lejiaolexue.cn/';
+const host = window.location.host;
+const protocol = window.location.protocol;
+let api = `${protocol}//${host}/`;
+
 
 //处理promise和fetch的兼容性以及引入
 require('es6-promise').polyfill();
@@ -14,8 +17,10 @@ let formatUrl = obj => {
 let Fetch = (url, option = {}) => {
   option.headers = option.headers || {};
 
-  // option.headers['token'] = `${window.localStorage.getItem('token')}`;
-  option.headers['Authorization'] = `8ed087cdf2ea00e7d223975de89d2a68af817f92cf95be5ce25c9e10e88c1f3f`;
+  option.headers['token'] = `${JSON.parse(window.sessionStorage.getItem('token')).token}`;
+  option.headers['Authorization'] = `${JSON.parse(window.sessionStorage.getItem('token')).token}`;
+ /*  option.headers['Authorization'] = `1dfd02d05871f65cc08c5dd09d7315f15b878556951bc9d0dde6397d8a29d255`;
+  option.headers['token'] = `1dfd02d05871f65cc08c5dd09d7315f15b878556951bc9d0dde6397d8a29d255`; */
 
   const m = (option.method || 'GET').toLocaleLowerCase();
   // get query format
@@ -30,7 +35,7 @@ let Fetch = (url, option = {}) => {
     option.body = JSON.stringify(option.body);
   }
   return new Promise((resolve, reject) => {
-    fetch(url, option)
+    fetch(api + url, option)
       .then(parseJSON)
       .then(response => resolve(response))
       .catch(error => {

@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'Styles/index.less';
-import ReleaseExercise from './Modules/ReleaseExercise';
+import AppView from './Modules/AppView';
 import * as serviceWorker from './serviceWorker';
 import configureStore from './Store';
 import { Provider } from 'react-redux';
 import { AppContainer } from 'react-hot-loader';
+import { HashRouter as Router} from "react-router-dom";
 
 
 // Create redux store
@@ -14,7 +15,9 @@ const store = configureStore();
 ReactDOM.render(
   <AppContainer>
     <Provider store={store}>
-      <ReleaseExercise />
+      <Router>
+        <AppView/>
+      </Router>
     </Provider>
   </AppContainer>
 , document.getElementById('root'));
